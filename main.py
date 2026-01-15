@@ -7,6 +7,7 @@ import webbrowser
 env_path = Path(__file__).parent / ".env"
 load_dotenv(env_path, override=True)
 twitch_web = "https://www.twitch.tv/"
+streamers = []
 
 def get_app_token():
     url = "https://id.twitch.tv/oauth2/token"
@@ -31,20 +32,25 @@ def is_streamer_live(username, token):
     r.raise_for_status()
 
     data = r.json()["data"]
-    # print("API Response Data:", data)  # Debugging line to check the response data
+    # print("API Response Data:", data)
     return len(data) > 0
 
 def get_streamer_input():
-    streamer = input("Enter the Twitch streamer username: ").strip()
-    return streamer
-
+    with open("streamer.txt", "r") as f:
+        streamers = [line.strip() for line in f if line.strip()]
+    return streamers if streamers else None
+    
 if __name__ == "__main__":
     token = get_app_token()
-    streamer = get_streamer_input()
-
-    if is_streamer_live(streamer, token):
-        print(f"{streamer} is LIVE 🔴")
-        webbrowser.open(twitch_web + streamer)
-    else:
-        print(f"{streamer} is offline")
+    streamers = get_streamer_input()
+    
+    if not streamers:
+        print("No streamer names provided in streamer.txt")
+    else: 
+        for streamer in streamers:
+            if is_streamer_live(streamer, token):
+                print(f"{streamer} is LIVE 🔴")
+                webbrowser.open(twitch_web + streamer)
+            else:
+                print(f"{streamer} is offline")
         
