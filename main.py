@@ -4,6 +4,8 @@ from pathlib import Path
 import os
 import webbrowser
 
+from util.toast import show_timed_toast, show_fail_toast
+
 env_path = Path(__file__).parent / ".env"
 load_dotenv(env_path, override=True)
 twitch_web = "https://www.twitch.tv/"
@@ -32,7 +34,6 @@ def is_streamer_live(username, token):
     r.raise_for_status()
 
     data = r.json()["data"]
-    # print("API Response Data:", data)
     return len(data) > 0
 
 def get_streamer_input():
@@ -41,16 +42,26 @@ def get_streamer_input():
     return streamers if streamers else None
     
 if __name__ == "__main__":
+    is_someone_live = False
     token = get_app_token()
     streamers = get_streamer_input()
     
     if not streamers:
-        print("No streamer names provided in streamer.txt")
+        print("No streamer names provided.")
     else: 
         for streamer in streamers:
             if is_streamer_live(streamer, token):
-                print(f"{streamer} is LIVE 🔴")
-                webbrowser.open(twitch_web + streamer)
-            else:
-                print(f"{streamer} is offline")
+                is_someone_live = True
+                
+                user_wants_to_go = show_timed_toast(f"{streamer} is LIVE 🔴")
+                
+                if user_wants_to_go:
+                    print(f"Opening browser for {streamer}...")
+                    webbrowser.open(twitch_web + streamer)
+                else:
+                    print(f"User cancelled opening for {streamer}.")
+                
+                break
+    if not is_someone_live:
+        show_fail_toast("No streamers are live right now.", seconds=5)
         
