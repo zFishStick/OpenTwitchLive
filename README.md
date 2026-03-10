@@ -8,5 +8,5 @@ This is a simple Python script that checks if a specified Twitch streamer is cur
 
 ## TODO
 - Add error handling for network issues and invalid streamer names
-- Refactor code and split into multiple files for better organization
-- Create a timer before starting the script, so user can decide not to run it immediately
+- ~~Refactor code and split into multiple files for better organization~~
+- ~~Create a timer before starting the script, so user can decide not to run it immediately~~
